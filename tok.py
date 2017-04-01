@@ -16,7 +16,7 @@ for line in lines:
         index = split.index(word);
 
 
-def cutAWindow (line ):
+def cut_window (line ):
    "This prints a passed string into this function"
    split = (line.split());
    index = split.index(word);
