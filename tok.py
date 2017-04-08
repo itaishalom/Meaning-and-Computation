@@ -50,13 +50,27 @@ def cut_window (line ):
 import os
 cwd = os.getcwd()
 path = nltk.data.find(cwd+'\\corpus_ex1.txt');
+#path = nltk.data.find(cwd+'\\temp.txt');
+word = 'play';
+seedA = 'game';
+seedB = 'music'
 raw = open(path, 'rU').read();
 raw = raw.replace('<s>','');
 raw = raw.replace('</s>','');
+
+raw = raw.lower();
+raw = raw.replace(word+'s',word);
+raw = raw.replace(word+'ed',word);
+raw = raw.replace(word+'ing',word);
+
+#raw = raw.replace(word+'-years',word+' years');
+raw = raw.replace(seedA+'s',seedA);
+#raw = raw.replace(seedA+'al',seedA);
+raw = raw.replace(seedB+'s',seedB);
+
+#raw = raw.replace('weighed',seedB);
 lines = sent_tokenize(raw);
-word = 'light';
-seedA = 'reflect';
-seedB = 'weight'
+
 senseA = [];
 senseB = [];
 allOccurences = [];
@@ -83,19 +97,35 @@ for line in lines:
                 senseB += [window];
 
 
-print (senseA)
-print (senseB)
+print ("There are " + str(len(senseA)) + " sentences with the seed " + seedA);
+print ("There are " + str(len(senseB)) + " sentences with the seed " + seedB);
 
 arr = (Counter(allOccurences))
-print(arr)
+
 arr = list(arr.items());
 
-arr.sort(key = itemgetter(1), reverse=True)
+arr.sort(key=itemgetter(1), reverse=True)
 i = 0;
 for key, value in arr:
-    if (word in key) or (seedA in key) or  (seedB in key) or (key == 's'):
+    if (word in key) or (seedA in key) or (seedB in key) or (key == 's') or (key == 'two') or (key == 'one')or (key == 'also') or (key == 'may')or (key == 'would')  :
         continue;
     i = i + 1;
     print(key + " " + str(value))
-    if i == 5:
+
+
+    keyInSenseA = 0;
+    keyInSenseB = 0;
+
+    for sentence in senseA:
+        temp = sentence.split().count(key)
+        #if temp>0:
+           # print(sentence)
+        keyInSenseA += temp
+
+    for sentence in senseB:
+        keyInSenseB += sentence.split().count(key)
+
+    print("The word " + key + " with the seed " + seedA + " occurs: " + str(keyInSenseA));
+    print("The word " + key + " with the seed " + seedB + " occurs: " + str(keyInSenseB));
+    if i == 15:
         break;
