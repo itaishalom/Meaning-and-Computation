@@ -119,7 +119,7 @@ for key, value in arr:
 
     keyInSenseA = 0;
     keyInSenseB = 0;
-
+    print("=====================================")
     for sentence in senseA:
         temp = sentence.split().count(key)
         #if temp>0:
@@ -129,12 +129,13 @@ for key, value in arr:
     for sentence in senseB:
         keyInSenseB += sentence.split().count(key)
 
-    if keyInSenseB == 0:
+    if keyInSenseB == 0 and keyInSenseA == 0:
         continue;
+    elif keyInSenseB == 0:
+        print("Collocation_i Log(SenseA/SenseB) = +infinity")
     elif keyInSenseA == 0:
-        continue;
+        print("Collocation_i Log(SenseA/SenseB) = -infinity")
     else:
-        print("=====================================")
         print("Collocation_i Log(SenseA/SenseB) = " + str(log10(keyInSenseA / keyInSenseB)))
     print(key + " " + str(value))
     print("The word " + key + " with the seed " + seedA + " occurs: " + str(keyInSenseA));
