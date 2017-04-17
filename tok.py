@@ -54,8 +54,8 @@ cwd = os.getcwd()
 path = nltk.data.find(cwd+'\\corpus_ex1.txt');
 #path = nltk.data.find(cwd+'\\temp.txt');
 word = 'play';
-seedA = 'game';
-seedB = 'music'
+seedA = 'home';
+seedB = 'guitar'
 raw = open(path, 'rU').read();
 raw = raw.replace('<s>','');
 raw = raw.replace('</s>','');
@@ -119,23 +119,28 @@ for key, value in arr:
 
     keyInSenseA = 0;
     keyInSenseB = 0;
-    print("=====================================")
+
     for sentence in senseA:
         temp = sentence.split().count(key)
-        #if temp>0:
-           # print(sentence)
+        if temp>0:
+            print(sentence)
         keyInSenseA += temp
 
     for sentence in senseB:
-        keyInSenseB += sentence.split().count(key)
+        if temp>0:
+            print(sentence)
+        keyInSenseB += temp
 
     if keyInSenseB == 0 and keyInSenseA == 0:
         continue;
     elif keyInSenseB == 0:
+        print("=====================================")
         print("Collocation_i Log(SenseA/SenseB) = +infinity")
     elif keyInSenseA == 0:
+        print("=====================================")
         print("Collocation_i Log(SenseA/SenseB) = -infinity")
     else:
+        print("=====================================")
         print("Collocation_i Log(SenseA/SenseB) = " + str(log10(keyInSenseA / keyInSenseB)))
     print(key + " " + str(value))
     print("The word " + key + " with the seed " + seedA + " occurs: " + str(keyInSenseA));

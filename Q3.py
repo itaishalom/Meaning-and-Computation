@@ -2,17 +2,21 @@ from nltk import pos_tag, word_tokenize
 import nltk
 from nltk.tokenize import sent_tokenize, word_tokenize, RegexpTokenizer
 from nltk.corpus import stopwords
-from collections import Counter
-from operator import itemgetter
+
 from nltk.stem.porter import *
-from math import log10
+
+first_arr = ["club began play home games","park home play four games","cardinals started play home games",
+             "september 1893 play home games","home games play stadio olimpico"];
+
+second_arr = ["dancing queen play guitar keyboards","last song play acoustic guitar","s guitar play often characterized",
+              "acoustic guitar play either unplugged","guitar style play"];
 
 
-def remove_stop_words(line):
-
+def remove_stop_words(input_line):
+    if word not in input_line:
+        return
     stop_words = set(stopwords.words('english'))
-
-    word_tokens = word_tokenize(line)
+    word_tokens = word_tokenize(input_line)
     stemmer = PorterStemmer()
     singles = [stemmer.stem(plural) for plural in word_tokens]
 
@@ -25,37 +29,40 @@ def remove_stop_words(line):
     new = ' '.join(filtered_sentence)
     tokenizer = RegexpTokenizer(r'\w+')
     res = tokenizer.tokenize(new)
+
+    newLine = "";
+    for word_res in res:
+        newLine += word_res+" ";
+
+    for fromQ1Sentence in first_arr:
+        if fromQ1Sentence in newLine:
+            print("========")
+            temp = line.split()
+            tempNewLine = "";
+            for word_temp in temp:
+                tempNewLine += word_temp + " ";
+            print(tempNewLine)
+
+    for fromQ1Sentence in second_arr:
+        if fromQ1Sentence in newLine:
+            print("========")
+            temp = line.split()
+            tempNewLine = "";
+            for word_temp in temp:
+                tempNewLine += word_temp + " ";
+            print(tempNewLine)
+
     return res;
 
 
-def cut_window (line ):
-   "This prints a passed string into this function"
-   split = line
-   index = split.index(word);
-   window = "";
-   if index-2 >= 0:
-    window = split[index - 2];
-
-    if index-1 >= 0:
-        window += " "+split[index - 1];
-
-    window += " "+split[index];
-
-    if index+1 < len(split):
-        window += " "+split[index + 1];
-
-   if index + 2 < len(split):
-       window += " " + split[index + 2];
-
-   return window
 
 import os
 cwd = os.getcwd()
 path = nltk.data.find(cwd+'\\corpus_ex1.txt');
 #path = nltk.data.find(cwd+'\\temp.txt');
 word = 'play';
-seedA = 'recreation';
-seedB = 'sound'
+seedA = 'home';
+seedB = 'guitar'
 raw = open(path, 'rU').read();
 raw = raw.replace('<s>','');
 raw = raw.replace('</s>','');
@@ -79,61 +86,4 @@ senseA = [];
 senseB = [];
 allOccurences = [];
 for line in lines:
-    split = line.split();
-    for words in split:
-      word_counter = word_counter+1;
-      if word == words:
-
-        try:
-            noStopWords = remove_stop_words(line)
-            window = cut_window(noStopWords);
-        except ValueError:
-                print ("ERROR ! ! ! ")
-                print (line);
-                print (noStopWords);
-        allOccurences += window.split();
-        if seedA in window:
-
-                senseA += [window];
-
-        elif seedB in window:
-
-                senseB += [window];
-
-
-print ("There are " + str(len(senseA)) + " sentences with the seed " + seedA);
-print ("There are " + str(len(senseB)) + " sentences with the seed " + seedB);
-
-arr = (Counter(allOccurences))
-
-arr = list(arr.items());
-
-arr.sort(key=itemgetter(1), reverse=True)
-i = 0;
-for key, value in arr:
-    if (word in key) or (seedA in key) or (seedB in key) or (key == 's') or (key == 'two') or (key == 'one')or (key == 'also') or (key == 'may')or (key == 'would')  :
-        continue;
-    i = i + 1;
-
-
-
-    keyInSenseA = 0;
-    keyInSenseB = 0;
-
-    for sentence in senseA:
-        temp = sentence.split().count(key)
-        #if temp>0:
-           # print(sentence)
-        keyInSenseA += temp
-
-    for sentence in senseB:
-        keyInSenseB += sentence.split().count(key)
-
-
-    print(key + " " + str(value))
-    print("The word " + key + " with the seed " + seedA + " occurs: " + str(keyInSenseA));
-    print("The word " + key + " with the seed " + seedB + " occurs: " + str(keyInSenseB));
-
-    if i == 15:
-        break;
-print("number of words: "+str(word_counter))
+    noStopWords = remove_stop_words(line)
