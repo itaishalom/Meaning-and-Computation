@@ -21,6 +21,13 @@ def prepare_file(filename):
     return sentences;
 
 
+
+def similars(model,pos_a,pos_b,neg_a,neg_real_value):
+    print(pos_a + " and " + pos_b + " minus " + neg_a +" should be " + neg_real_value)
+    print(model.most_similar(positive=[pos_a, pos_b], negative=[neg_a]))
+
+
+
 def create_file_and_spearman(sentences, window, size,simlex):
     lines = tuple(open(simlex, 'r'))
     file_name = open(cwd + '\\size' + str(size) + '_window' + str(window) + '.txt', 'w');
@@ -65,6 +72,17 @@ def create_file_and_spearman(sentences, window, size,simlex):
     print("Spearman for window " + str(window) + " and size " + str(size) + " N: " + str(spearmanr(list_pos_n, list_pos__n_simlex)))
     print("Spearman for window " + str(window) + " and size " + str(size) + " V: " + str(spearmanr(list_pos__v, list_pos__v_simlex)))
     print("Spearman for window " + str(window) + " and size " + str(size) + " ALL: " + str(spearmanr(list_pos_all, list_pos_all_simlex)))
+    print("\nSimilarities:")
+    similars(word_to_vec, 'big', 'tall', 'small', 'short');
+    similars(word_to_vec, 'man', 'flower', 'fetus', 'bud');
+    similars(word_to_vec, 'lake', 'meadow', 'pool', 'garden');
+    similars(word_to_vec, 'word', 'brick', 'book', 'building');
+    similars(word_to_vec, 'doctor', 'veterinarian', 'human', 'animal');
+    word_to_vec
+
+
+
+
 
 cwd = os.getcwd()
 path_corp = nltk.data.find(cwd+'\\corpus_ex2_3.txt');
