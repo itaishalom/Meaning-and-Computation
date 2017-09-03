@@ -49,21 +49,76 @@ def cut_window(line):
     return window
 
 
+def one_sense_per_discourse(this_seed_a, this_seed_b, this_seed_c, my_dict):
+    from sentence import sentence
+    is_changed = False
+    for entry in my_dict:
+        seed_counter_a = 0
+        seed_counter_b = 0
+        seed_counter_c = 0
+        toCheck = my_dict[entry]
+        if type(toCheck) is sentence:
+            if toCheck.get_label() == this_seed_a:
+                answer = original_seedA
+            if toCheck.get_label() == this_seed_b:
+                answer = original_seedB
+            if toCheck.get_label() == this_seed_c:
+                answer = original_seedC
+            if entry not in wiki_entries_senses:
+
+                wiki_entries_senses[entry] = answer
+                is_changed = True
+            else:
+                if wiki_entries_senses[entry] != answer:
+                    print(entry + ": " + wiki_entries_senses[entry] + " -> " + answer)
+                    wiki_entries_senses[entry] = answer
+                    is_changed = True
+        else:
+            for all_play_sententces in toCheck:
+                if all_play_sententces.get_label() == this_seed_a:
+                    seed_counter_a = seed_counter_a + 1
+                if all_play_sententces.get_label() == this_seed_b:
+                    seed_counter_b = seed_counter_b + 1
+                if all_play_sententces.get_label() == this_seed_c:
+                    seed_counter_c = seed_counter_c + 1
+            sum_of_all = seed_counter_a + seed_counter_b + seed_counter_c
+            if sum_of_all == 0:
+                print("fuck")
+            answer = ""
+            if seed_counter_a / sum_of_all > accepted_percentage:
+                answer = original_seedA
+            if seed_counter_b / sum_of_all > accepted_percentage:
+                answer = original_seedB
+            if seed_counter_c / sum_of_all > accepted_percentage:
+                answer = original_seedC
+            if answer == "": #Undecided
+                continue
+            if entry not in wiki_entries_senses:
+                wiki_entries_senses[entry] = answer
+                is_changed = True
+            else:
+                if wiki_entries_senses[entry] != answer:
+                    print(entry + ": " + wiki_entries_senses[entry] + " -> " + answer)
+                    wiki_entries_senses[entry] = answer
+                    is_changed = True
+    return is_changed
+
+
 def runOnSeeds(seedA, seedB, seedC):
+    my_dict = dict()
     from sentence import sentence
     senseA = []
     senseB = []
     senseC = []
     allOccurences = []
     for line in lines:
-        if line.startswith("<text id="):
+        if "<text id=" in line:
             header = line
             headerSplit = header.split("wikipedia:")
             header = headerSplit[1]
             headerSplit = header.split(">")
             header = headerSplit[0]
             header = header.replace("\"", "");
-            print(header)
             continue
         split = line.split()
         for words in split:
@@ -82,24 +137,29 @@ def runOnSeeds(seedA, seedB, seedC):
                     senseA += [window]
                     new_sentence = sentence(window, seedA)
 
-
                 elif seedB in window:
                     senseB += [window]
                     new_sentence = sentence(window, seedB)
 
                 elif seedC in window:
                     senseC += [window]
-                    new_sentence = sentence(window, seedC  )
+                    new_sentence = sentence(window, seedC)
 
-                if(new_sentence is not None):
+                if new_sentence is not None:
                     if header not in my_dict:
                         my_dict[header] = new_sentence
                     else:
-                        wordList = [my_dict[header]]
-                        wordList.append(new_sentence)
-                        my_dict[header] = wordList
+                        wordList = my_dict[header]
+                        if type(wordList) is sentence:
+                            listOfSents = [wordList, new_sentence]
+                            my_dict[header] = listOfSents
+                        else:
+                            wordList.append(new_sentence)
+                            my_dict[header] = wordList
 
-
+    should_continue = one_sense_per_discourse(seedA, seedB, seedC, my_dict)
+    if not should_continue:
+        return seedA, seedB, seedC
     print("There are " + str(len(senseA)) + " sentences with the seed " + seedA)
     print("There are " + str(len(senseB)) + " sentences with the seed " + seedB)
     print("There are " + str(len(senseC)) + " sentences with the seed " + seedC)
@@ -179,7 +239,7 @@ def runOnSeeds(seedA, seedB, seedC):
         if keyInSenseA == max(keyInSenseA, keyInSenseB, keyInSenseC):
             dividor = max(1, keyInSenseB + keyInSenseC)
             grade = log10(keyInSenseA / dividor)
-            if (grade > MaxSenseA):
+            if grade > MaxSenseA:
                 MaxSenseA = grade
                 MaxWordSenseA = key
 
@@ -212,9 +272,9 @@ cwd = os.getcwd()
 path = nltk.data.find(cwd + '\\coprs\\corpus_ex1.txt');
 # path = nltk.data.find(cwd+'\\temp.txt');
 word = 'play'
-seedA = 'game'
-seedB = 'role'
-seedC = 'music'
+original_seedA = 'game'
+original_seedB = 'role'
+original_seedC = 'music'
 raw = open(path, 'rU', encoding="utf8").read();
 raw = raw.replace('<s>', '');
 raw = raw.replace('</s>', '');
@@ -227,13 +287,20 @@ raw = raw.replace(word + 'ed', word);
 raw = raw.replace(word + 'ing', word)
 
 # raw = raw.replace(word+'-years',word+' years');
-raw = raw.replace(seedA + 's', seedA);
+raw = raw.replace(original_seedA + 's', original_seedA);
 # raw = raw.replace(seedA+'al',seedA);
-raw = raw.replace(seedB + 's', seedB);
-raw = raw.replace(seedB + 'al', seedB);
+raw = raw.replace(original_seedB + 's', original_seedB);
+raw = raw.replace(original_seedB + 'al', original_seedB);
 # raw = raw.replace('weighed',seedB);
 lines = sent_tokenize(raw)
-my_dict = dict()
+
+wiki_entries_senses = dict()
+accepted_percentage = 0.6
+
+seedA = original_seedA
+seedB = original_seedB
+seedC = original_seedC
+
 while True:
     (newA, newB, newC) = runOnSeeds(seedA, seedB, seedC)
     print("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!new seeds:!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")

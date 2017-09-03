@@ -3,6 +3,12 @@ class sentence:
         self.window = window
         self.label = label
 
+    def get_label(self):
+        return self.label
+
+    def get_window(self):
+        return self.window
+
     def __str__(self):
         sent = ""
         for word in self.window:
