@@ -69,9 +69,12 @@ def one_sense_per_discourse(this_seed_a, this_seed_b, this_seed_c, my_dict):
                 wiki_entries_senses[entry] = answer
                 is_changed = True
             else:
-                if wiki_entries_senses[entry] != answer:
+                tempSenses = wiki_entries_senses[entry];
+                splited = tempSenses.split(" -> ")
+                lastSense = splited[len(splited)-1]
+                if lastSense != answer:
                     print(entry + ": " + wiki_entries_senses[entry] + " -> " + answer)
-                    wiki_entries_senses[entry] = answer
+                    wiki_entries_senses[entry] += " -> " + answer
                     is_changed = True
         else:
             for all_play_sententces in toCheck:
@@ -97,9 +100,12 @@ def one_sense_per_discourse(this_seed_a, this_seed_b, this_seed_c, my_dict):
                 wiki_entries_senses[entry] = answer
                 is_changed = True
             else:
-                if wiki_entries_senses[entry] != answer:
+                tempSenses = wiki_entries_senses[entry];
+                splited = tempSenses.split(" -> ")
+                lastSense = splited[len(splited)-1]
+                if lastSense != answer:
                     print(entry + ": " + wiki_entries_senses[entry] + " -> " + answer)
-                    wiki_entries_senses[entry] = answer
+                    wiki_entries_senses[entry] += " -> " + answer
                     is_changed = True
     return is_changed
 
@@ -177,11 +183,9 @@ def runOnSeeds(seedA, seedB, seedC):
     MaxWordSenseB = seedB
     MaxWordSenseC = seedC
     for key, value in arr:
-        if (word in key) or (seedA in key) or (seedC in key) or (seedB in key) or (key == 's') or (
-                    key == 'two') or (
-                    key == 'one') or (
-                    key == 'also') or (key == 'may') or (key == 'would') or (key == 'first') or (key == 'often') or (
-                    key == 'many'):
+        if (word in key) or (key in all_seeds_a) or (key in all_seeds_b) or (key in all_seeds_c) or (key == 's') or (key == 'two')\
+                or (key == 'one') or ( key == 'also') or (key == 'may') or (key == 'would') or (key == 'first')\
+                or (key == 'often') or ( key == 'many')or ( key == 'new'):
             continue
 
         sentences_A = []
@@ -225,56 +229,54 @@ def runOnSeeds(seedA, seedB, seedC):
         if keyInSenseB == 0 and keyInSenseA == 0 and keyInSenseC == 0:
             # print("--------------------------------------------------------------------------------")
             continue
-            #      elif keyInSenseB == 0:
-            # print("==============")
-            #          print("Collocation_i Log(SenseA/SenseB) = +infinity")
-            #      elif keyInSenseA == 0:
-            # print("==============")
-            #          print("Collocation_i Log(SenseA/SenseB) = -infinity")
-            #    else:
-        # print("==============")
-        #        print("Collocation_i Log(SenseA/SenseB) = " + str(log10(keyInSenseA / keyInSenseB)))
-        i = i + 1
+
 
         if keyInSenseA == max(keyInSenseA, keyInSenseB, keyInSenseC):
-            dividor = max(1, keyInSenseB + keyInSenseC)
+            if keyInSenseA == keyInSenseB or keyInSenseC == keyInSenseA:
+                continue
+            dividor = max(0.1, keyInSenseB + keyInSenseC)
             grade = log10(keyInSenseA / dividor)
-            if grade > MaxSenseA:
+            if grade > MaxSenseA and key not in all_seeds_a:
                 MaxSenseA = grade
                 MaxWordSenseA = key
 
-        elif keyInSenseB == max(keyInSenseA, keyInSenseB, keyInSenseC):
-            dividor = max(1, keyInSenseA + keyInSenseC)
+        if keyInSenseB == max(keyInSenseA, keyInSenseB, keyInSenseC):
+            if keyInSenseA == keyInSenseB or keyInSenseC == keyInSenseB:
+                continue
+            dividor = max(0.1, keyInSenseA + keyInSenseC)
             grade = log10(keyInSenseB / dividor)
-            if (grade > MaxSenseB):
+            if grade > MaxSenseB and key not in all_seeds_b:
                 MaxSenseB = grade
                 MaxWordSenseB = key
 
-        elif keyInSenseC == max(keyInSenseA, keyInSenseB, keyInSenseC):
-            dividor = max(1, keyInSenseA + keyInSenseB)
+        if keyInSenseC == max(keyInSenseA, keyInSenseB, keyInSenseC):
+            if keyInSenseC == keyInSenseB or keyInSenseC == keyInSenseA:
+                continue
+            dividor = max(0.1, keyInSenseA + keyInSenseB)
             grade = log10(keyInSenseC / dividor)
-            if (grade > MaxSenseC):
+            if grade > MaxSenseC and key not in all_seeds_c:
                 MaxSenseC = grade
                 MaxWordSenseC = key
 
-        print(key + " " + str(value))
-        print("The word " + key + " with the seed " + seedA + " occurs: " + str(keyInSenseA))
-        print("The word " + key + " with the seed " + seedB + " occurs: " + str(keyInSenseB))
-        print("The word " + key + " with the seed " + seedC + " occurs: " + str(keyInSenseC))
-        print("--------------------------------------------------------------------------------")
-        if i == 15:
+        i = i + 1
+     #   print(key + " " + str(value))
+     #   print("The word " + key + " with the seed " + seedA + " occurs: " + str(keyInSenseA))
+     #   print("The word " + key + " with the seed " + seedB + " occurs: " + str(keyInSenseB))
+     #   print("The word " + key + " with the seed " + seedC + " occurs: " + str(keyInSenseC))
+     #   print("--------------------------------------------------------------------------------")
+        if i == 25:
             return (MaxWordSenseA, MaxWordSenseB, MaxWordSenseC)
 
 
 import os
 
 cwd = os.getcwd()
-path = nltk.data.find(cwd + '\\coprs\\corpus_ex1.txt');
+path = nltk.data.find(cwd + '\\coprs\\corpus_ex2_3.txt');
 # path = nltk.data.find(cwd+'\\temp.txt');
 word = 'play'
 original_seedA = 'game'
 original_seedB = 'role'
-original_seedC = 'music'
+original_seedC = 'instrument'
 raw = open(path, 'rU', encoding="utf8").read();
 raw = raw.replace('<s>', '');
 raw = raw.replace('</s>', '');
@@ -290,27 +292,49 @@ raw = raw.replace(word + 'ing', word)
 raw = raw.replace(original_seedA + 's', original_seedA);
 # raw = raw.replace(seedA+'al',seedA);
 raw = raw.replace(original_seedB + 's', original_seedB);
-raw = raw.replace(original_seedB + 'al', original_seedB);
+raw = raw.replace(original_seedC + 's', original_seedC);
+raw = raw.replace(original_seedC + 'al', original_seedB);
 # raw = raw.replace('weighed',seedB);
 lines = sent_tokenize(raw)
 
 wiki_entries_senses = dict()
-accepted_percentage = 0.6
+accepted_percentage = 0.7
 
 seedA = original_seedA
 seedB = original_seedB
 seedC = original_seedC
 
-while True:
+all_seeds_a = [seedA]
+all_seeds_b = [seedB]
+all_seeds_c = [seedC]
+file_name = open(cwd + '\\projectResultFor' + str(accepted_percentage) + '.txt', 'w');
+file_name.write("Starting seeds: \n")
+file_name.write(seedA+"\n")
+file_name.write(seedB+"\n")
+file_name.write(seedC+"\n")
+for x in range(0, 3):
     (newA, newB, newC) = runOnSeeds(seedA, seedB, seedC)
     print("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!new seeds:!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
     print(newA)
     print(newB)
     print(newC)
     if newC == seedC and newA == seedA and newB == seedB:
+        for line in wiki_entries_senses:
+            file_name.write(line+": "+wiki_entries_senses[line]+"\n")
+        file_name.close()
         break
     else:
+        all_seeds_a.append(newA)
+        all_seeds_b.append(newB)
+        all_seeds_c.append(newC)
+        file_name.write("new seeds: \n")
         seedA = newA
         seedB = newB
         seedC = newC
+        file_name.write(seedA+"\n")
+        file_name.write(seedB+"\n")
+        file_name.write(seedC+"\n")
     print("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!:!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
+for line in wiki_entries_senses:
+    file_name.write(line+": "+wiki_entries_senses[line] + "\n")
+file_name.close()
