@@ -85,8 +85,6 @@ def one_sense_per_discourse(this_seed_a, this_seed_b, this_seed_c, my_dict):
                 if all_play_sententces.get_label() == this_seed_c:
                     seed_counter_c = seed_counter_c + 1
             sum_of_all = seed_counter_a + seed_counter_b + seed_counter_c
-            if sum_of_all == 0:
-                print("fuck")
             answer = ""
             if seed_counter_a / sum_of_all > accepted_percentage:
                 answer = original_seedA
@@ -297,44 +295,47 @@ raw = raw.replace(original_seedC + 'al', original_seedB);
 # raw = raw.replace('weighed',seedB);
 lines = sent_tokenize(raw)
 
-wiki_entries_senses = dict()
-accepted_percentage = 0.7
+allPerc = [0.5,0.6,0.7,0.8]
 
-seedA = original_seedA
-seedB = original_seedB
-seedC = original_seedC
+for per in allPerc:
+    wiki_entries_senses = dict()
+    accepted_percentage = per
 
-all_seeds_a = [seedA]
-all_seeds_b = [seedB]
-all_seeds_c = [seedC]
-file_name = open(cwd + '\\projectResultFor' + str(accepted_percentage) + '.txt', 'w');
-file_name.write("Starting seeds: \n")
-file_name.write(seedA+"\n")
-file_name.write(seedB+"\n")
-file_name.write(seedC+"\n")
-for x in range(0, 3):
-    (newA, newB, newC) = runOnSeeds(seedA, seedB, seedC)
-    print("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!new seeds:!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
-    print(newA)
-    print(newB)
-    print(newC)
-    if newC == seedC and newA == seedA and newB == seedB:
-        for line in wiki_entries_senses:
-            file_name.write(line+": "+wiki_entries_senses[line]+"\n")
-        file_name.close()
-        break
-    else:
-        all_seeds_a.append(newA)
-        all_seeds_b.append(newB)
-        all_seeds_c.append(newC)
-        file_name.write("new seeds: \n")
-        seedA = newA
-        seedB = newB
-        seedC = newC
-        file_name.write(seedA+"\n")
-        file_name.write(seedB+"\n")
-        file_name.write(seedC+"\n")
-    print("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!:!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
-for line in wiki_entries_senses:
-    file_name.write(line+": "+wiki_entries_senses[line] + "\n")
-file_name.close()
+    seedA = original_seedA
+    seedB = original_seedB
+    seedC = original_seedC
+
+    all_seeds_a = [seedA]
+    all_seeds_b = [seedB]
+    all_seeds_c = [seedC]
+    file_name = open(cwd + '\\projectResultFor' + str(accepted_percentage) + '.txt', 'w');
+    file_name.write("Starting seeds: \n")
+    file_name.write(seedA+"\n")
+    file_name.write(seedB+"\n")
+    file_name.write(seedC+"\n")
+    for x in range(0, 3):
+        (newA, newB, newC) = runOnSeeds(seedA, seedB, seedC)
+        print("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!new seeds:!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
+        print(newA)
+        print(newB)
+        print(newC)
+        if newC == seedC and newA == seedA and newB == seedB:
+            for line in wiki_entries_senses:
+                file_name.write(line+": "+wiki_entries_senses[line]+"\n")
+            file_name.close()
+            break
+        else:
+            all_seeds_a.append(newA)
+            all_seeds_b.append(newB)
+            all_seeds_c.append(newC)
+            file_name.write("new seeds: \n")
+            seedA = newA
+            seedB = newB
+            seedC = newC
+            file_name.write(seedA+"\n")
+            file_name.write(seedB+"\n")
+            file_name.write(seedC+"\n")
+        print("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!:!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
+    for line in wiki_entries_senses:
+        file_name.write(line+": "+wiki_entries_senses[line] + "\n")
+    file_name.close()
